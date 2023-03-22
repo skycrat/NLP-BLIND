@@ -1,0 +1,19 @@
+{
+    "credentials":
+    {
+        "vision" :
+        {
+            "subskey": "c086a2ca2f7f4821a7f5ec100d8db09c",
+            "endpoint": "https://cv-nlp-eus2.cognitiveservices.azure.com/"
+        },
+
+        "speech":
+
+        {
+            "subskey": "b0e1cbc8968d41d7afb7bb02492deb88",
+            "endpoint": "https://ts-nlp-eus2.cognitiveservices.azure.com/sts/v1.0/issuetoken",
+            "region" : "eastus2"
+        }
+
+    }
+}
