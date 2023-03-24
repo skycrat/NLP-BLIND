@@ -1,4 +1,5 @@
 import json
+import time
 import cv2
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from msrest.authentication import CognitiveServicesCredentials
@@ -25,46 +26,53 @@ cam = cv2.VideoCapture(0)
 cv2.namedWindow("test")
 img_counter = 0
 
+pre_description = ''
+
 while True:
+    #time.sleep(10)  #arreglar la posición del time sleep
     ret, frame = cam.read()
+    frame = cv2.flip(frame, 1)
+    
     if not ret:
         print("Failed to grab frame")
         break
 
     # Display the captured frame in a window
     cv2.imshow("test", frame)
-    k = cv2.waitKey(1)
+    k = cv2.waitKey(1)  
 
-    # Break the loop if the user presses the "ESC" key
+    #Break the loop if the user presses the "ESC" key 
     if k % 256 == 27:
         print("Closing the app")
         break
 
-    # Take a screenshot and analyze the spatial environment if the user presses the space bar
-    elif k % 256 == 32:
+    # Take a screenshot and analyze the spatial environment 
+    if True:
         img_name = "opencv_frame_{}.png".format(img_counter)
         cv2.imwrite(img_name, frame)
         print("Screenshot taken")
         img_counter += 1
-
+        
         # Analyze the image using the Azure Computer Vision API
         with open(img_name, "rb") as image_stream:
             response = computervision_client.analyze_image_in_stream(
                 image_stream, visual_features=['Categories', 'Description', 'Objects'])
             description = response.description.captions[0].text
+            if description == pre_description:
+                continue
             print(description)
-
+            pre_description = description
             # Convert the description to speech using the Azure Text to Speech API
             result = speech_synthesizer.speak_text_async(description).get()
 
-            # Save the speech output to a file
-            speech_file = "speech_{}.wav".format(img_counter)
+            # Save the speech output to a file   
+            speech_file = "speech_{}.wav".format(img_counter) #poner que el codigo sobreescriba el archivo
             with open(speech_file, "wb") as file:
                 file.write(result.audio_data)
 
             # Play the speech output
             os.system("start " + speech_file)
-
+            
 # Release the video capture object and destroy the window
 cam.release()
 cv2.destroyAllWindows()
